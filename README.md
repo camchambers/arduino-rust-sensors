@@ -1,4 +1,4 @@
-rust-sensor-playground
+Arduino Rust Sensors
 ======================
 
 Rust project for the _Arduino Uno_ using components from the **KEYESTUDIO 48 Sensors Modules Starter Kit for Arduino**.
