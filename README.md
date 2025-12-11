@@ -24,6 +24,7 @@ This project uses Cargo's `examples/` directory to organize multiple programs:
 ## Available Examples
 - `buzzer.rs` - Play musical patterns on a buzzer (button cycles through songs)
 - `traffic-light.rs` - Animated LED patterns with red, yellow, and green lights
+- `rgb-led.rs` - Cycle through colors on an RGB LED (red, green, blue, yellow, cyan, magenta, white)
 
 [`avr-hal` README]: https://github.com/Rahix/avr-hal#readme
 [`ravedude`]: https://crates.io/crates/ravedude
