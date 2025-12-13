@@ -21,6 +21,21 @@ This project uses Cargo's `examples/` directory to organize multiple programs:
 4. `ravedude` will open a console session after flashing where you can interact
    with the UART console of your board.
 
+## Interactive Menu
+You can use the included script to easily select and flash examples:
+
+**Linux/macOS:**
+```bash
+./menu.sh
+```
+
+**Windows:**
+```cmd
+menu.bat
+```
+
+This will show a numbered list of all available examples and let you choose one to flash.
+
 ## Available Examples
 - `buzzer.rs` - Play musical patterns on a buzzer (button cycles through songs)
 - `joystick-dot.rs` - Control a dot on 8x8 LED matrix with joystick (with drawing mode)
