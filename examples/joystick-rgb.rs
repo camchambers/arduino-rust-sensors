@@ -27,11 +27,12 @@
 //!   - V (VCC) → 5V on Arduino
 //!   - X → A0 (Analog input for X-axis)
 //!   - Y → A1 (Analog input for Y-axis)
-//!   - B (Button) → Not used in this example
+//!   - B (Button) → Pin D2 (with internal pull-up resistor)
 //!
 //! ## Usage
 //! Flash to Arduino: `cargo run --example joystick-rgb`
 //! Move the joystick to see different colors on the RGB LED!
+//! Press the joystick button to flash the current color 3 times!
 
 #![no_std]
 #![no_main]
@@ -43,6 +44,10 @@ use arduino_hal::adc;
 const CENTER_VALUE: u16 = 512;
 const THRESHOLD: u16 = 300; // Larger deadzone around center for "off" state
 
+// Button flash settings
+const FLASH_COUNT: u8 = 5;
+const FLASH_INTERVAL: u32 = 80; // milliseconds
+
 #[arduino_hal::entry]
 fn main() -> ! {
     let dp = arduino_hal::Peripherals::take().unwrap();
@@ -52,6 +57,9 @@ fn main() -> ! {
     let mut red = pins.d11.into_output();
     let mut green = pins.d12.into_output();
     let mut blue = pins.d13.into_output();
+    
+    // Joystick button pin (active low with pull-up)
+    let button = pins.d2.into_pull_up_input();
     
     // Initialize ADC for joystick
     let mut adc = adc::Adc::new(dp.ADC, Default::default());
@@ -65,6 +73,9 @@ fn main() -> ! {
     green.set_low();
     blue.set_low();
 
+    // Track button state for edge detection
+    let mut button_was_pressed = false;
+
     loop {
         // Read joystick position
         let x_raw = x_axis.analog_read(&mut adc);
@@ -77,6 +88,11 @@ fn main() -> ! {
         let y_up = y_raw > CENTER_VALUE + THRESHOLD;   // Swapped for hardware correction
         let y_down = y_raw < CENTER_VALUE - THRESHOLD; // Swapped for hardware correction
         let center = !x_left && !x_right && !y_up && !y_down;
+        
+        // Store current LED state before updating
+        let current_red = red.is_set_high();
+        let current_green = green.is_set_high();
+        let current_blue = blue.is_set_high();
         
         // Set RGB LED color based on joystick position
         // Note: Common Anode LED means LOW is ON, HIGH is OFF
@@ -126,6 +142,29 @@ fn main() -> ! {
             green.set_low();
             blue.set_high();
         }
+        
+        // Check for button press (active low)
+        let button_pressed = button.is_low();
+        
+        // Detect button press edge (wasn't pressed before, but is now)
+        if button_pressed && !button_was_pressed {
+            // Flash the current color 3 times
+            for _ in 0..FLASH_COUNT {
+                // Turn off (all high for common anode)
+                red.set_high();
+                green.set_high();
+                blue.set_high();
+                arduino_hal::delay_ms(FLASH_INTERVAL);
+                
+                // Restore current color
+                if current_red { red.set_high(); } else { red.set_low(); }
+                if current_green { green.set_high(); } else { green.set_low(); }
+                if current_blue { blue.set_high(); } else { blue.set_low(); }
+                arduino_hal::delay_ms(FLASH_INTERVAL);
+            }
+        }
+        
+        button_was_pressed = button_pressed;
         
         // Small delay for stability
         arduino_hal::delay_ms(50);
