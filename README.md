@@ -23,8 +23,24 @@ This project uses Cargo's `examples/` directory to organize multiple programs:
 
 ## Available Examples
 - `buzzer.rs` - Play musical patterns on a buzzer (button cycles through songs)
+- `joystick-dot.rs` - Control a dot on 8x8 LED matrix with joystick (with drawing mode)
+- `joystick-rgb.rs` - Control RGB LED color with joystick position
+- `led-matrix.rs` - Display patterns on 8x8 LED matrix (heart, smiley face)
+- `rgb-led.rs` - Cycle through colors on an RGB LED (rainbow fade, red, green, blue, yellow, cyan, magenta, white)
 - `traffic-light.rs` - Animated LED patterns with red, yellow, and green lights
-- `rgb-led.rs` - Cycle through colors on an RGB LED (red, green, blue, yellow, cyan, magenta, white)
+
+## Troubleshooting
+
+### Serial Port Issues
+If you see an error like `avrdude error: unable to open programmer arduino on port /dev/ttyACM0`, your Arduino might be assigned to a different port.
+
+**Solutions:**
+1. **Auto-detect**: `ravedude` attempts to find the board automatically. Ensure only one Arduino is connected.
+2. **Override Command**: If auto-detection fails, specify the port manually:
+   ```bash
+   RAVEDUDE_PORT=/dev/ttyACM1 cargo run --example <name>
+   ```
+3. **Check your port**: Run `ls /dev/ttyACM*` to see available ports.
 
 [`avr-hal` README]: https://github.com/Rahix/avr-hal#readme
 [`ravedude`]: https://crates.io/crates/ravedude
